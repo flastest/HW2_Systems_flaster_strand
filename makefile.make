@@ -4,7 +4,7 @@ CCFLAGS = -Wall -Wextra -pedantic -Werror --std=c++17 -g
 .cpp.o:
 	$(CXX) $(CCFLAGS) -c -O3 $<
 
-all: cache_test 
+all: cache_test clean
 
 cache_test: cache.o test_cache.o
 	$(CXX) $(CCFLAGS) -o test_cache cache.o test_cache.o
