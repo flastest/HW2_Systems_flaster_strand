@@ -13,15 +13,15 @@ public:
 	Impl(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
-        hash_func hasher)
-	mMaxmem : maxmem, mMax_load_factor: max_load_factor,
-	mEvictor : evictor, mHasher : hasher
+        hash_func hasher):
+	mMaxmem (maxmem), mMax_load_factor (max_load_factor),
+	mEvictor (evictor), mHasher (hasher)
 	{}
 
 
 }
 
-Cache::Cache(size_type maxmem,
+Cache(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
         hash_func hasher)
