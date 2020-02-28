@@ -26,8 +26,32 @@ Cache::Cache(size_type maxmem,
         Evictor* evictor = nullptr,
         hash_func hasher = std::hash<key_type>())
 {
-
+	pImpl_ = new Impl(maxmem,max_load_factor,evictor,hasher);
 }
 
 
-Cache::~Cache();
+void set(key_type key, val_type val, size_type size)
+{
+
+
+}
+
+val_type get(key_type key, size_type& val_size) const 
+{
+	return nullptr;
+}
+
+bool del(key_type key)
+{
+	return true;
+}
+
+size_type space_used() const 
+{
+	return static_cast<uint32_t>(966);
+}
+
+void reset()
+{
+	
+}
