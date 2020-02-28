@@ -1,7 +1,7 @@
 #include "cache.hh"
 
 
-Cache::Impl 
+class Cache::Impl
 {
 private:
 	size_type mMaxmem;
@@ -22,9 +22,9 @@ public:
 }
 
 Cache::Cache(size_type maxmem,
-        float max_load_factor = 0.75,
-        Evictor* evictor = nullptr,
-        hash_func hasher = std::hash<key_type>())
+        float max_load_factor,
+        Evictor* evictor,
+        hash_func hasher)
 {
 	pImpl_ = new Impl(maxmem,max_load_factor,evictor,hasher);
 }
