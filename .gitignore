@@ -1,0 +1,5 @@
+*.o
+pimpl.cc
+pimpl.hh
+*.exe
+*.out
