@@ -1,6 +1,6 @@
 #include "cache.hh"
 
-
+#include <map>
 
 class Cache::Impl
 {
@@ -36,7 +36,7 @@ public:
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
 	mEvictor(evictor), mHasher(hasher)
 	{
-		data = new Cache::val_type[mMaxmem](); 
+		data = std::make_unique<Cache::val_type>(new Cache::byte_type[mMaxmem]());
 							//here, the parens on the end initialize
 							// all of the things in data to zeros.
 	}
@@ -55,7 +55,10 @@ public:
 			if (index_that_we_are_up_to + size < mMaxmem ) 
 			{
 				//add key to the key map
-				keys[key] = data + size;
+				keys[key] = &(data[size]);
+				// keys is of val_type
+				// data is of val_type
+				// size is of size_type
 
 				//first put the data in
 				for (int i = 0; i < size)	
