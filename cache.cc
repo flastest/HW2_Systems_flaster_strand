@@ -55,15 +55,15 @@ public:
 			if (index_that_we_are_up_to + size < mMaxmem )
 			{
 				//add key to the key map
-				keys[key] = &(data[size]);
+				keys[key] = &(data.get()[size]);
 				// keys is of val_type
 				// data is of val_type
 				// size is of size_type
 
 				//first put the data in
-				for (int i = 0; i < size)
+				for (size_type i = 0; i < size; i++)
 				{
-					data[index_that_we_are_up_to + i] = val[i];
+					data.get()[index_that_we_are_up_to + i] = val[i];
 				}
 
 				//the increment data for trivial implementation
@@ -72,13 +72,13 @@ public:
 
 		}
 		//there isn't room for anything if there's only 1 byte left
-		if (index_that_we_are_up_to +1  >= maxmem)
+		if (index_that_we_are_up_to +1  >= mMaxmem)
 		{
 			is_full = true;
 		}
 	}
 
-	Cache::val_type get(key_type key, size_type& val_size) 
+	Cache::val_type get(key_type key, size_type& val_size) const
 	{
 
 
@@ -91,7 +91,7 @@ public:
 
 
 		return keys.at(key);
-	//idfk what eitan wants us to do with val_size
+	
 	}
 
 	//get size given a ptr to the start of val, should be easy seeing as all
@@ -105,8 +105,36 @@ public:
 		while(data[val+iter] != '\0')
 		{
 			size++;
+			iter++;
 		}
 		return size;
+	}
+
+
+
+	bool del(key_type key)
+	{
+
+		//this impl should be in impl
+		if(keys.count(key) == 0){
+			return false;
+		}
+
+		is_full = false;
+
+		//need to get size of key somehow
+
+		//first go to the pointer of key
+		auto ptr_to_value = keys[key];
+
+		//then iterate though values til u get to "\0",deleting everything
+		//this should be in impl.
+
+		//then remove key from the table
+
+
+		index_that_we_are_up_to = ptr_to_value;
+		return true;
 	}
 };
 
@@ -138,26 +166,9 @@ Cache::val_type get(key_type key, Cache::size_type& Cache::val_size) const
 //for now, in initial implementation, only use this to delete the last value
 bool del(key_type key)
 {
-	//this impl should be in impl
-	if(!pImpl_->keys.find(key)){
-		return false;
-	}
 
-	pImpl_ ->is_full = false;
-
-	//need to get size of key somehow
-
-	//first go to the pointer of key
-	auto ptr_to_value = pImpl_ -> keys[key];
-
-	//then iterate though values til u get to "\0",deleting everything
-	//this should be in impl.
-
-	//then remove key from the table
-
-
-	index_that_we_are_up_to = ptr_to_value;
-	return true;
+	return pImpl_ -> del(key);
+	
 }
 
 
