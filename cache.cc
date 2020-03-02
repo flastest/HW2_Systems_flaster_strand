@@ -11,7 +11,7 @@ private:
 	hash_func mHasher;
 
 	
-	std::unique_ptr<Cache::val_type> data;
+	std::unique_ptr<Cache::byte_type> data;
 
 	
 	Cache::size_type index_that_we_are_up_to = 0;
@@ -19,11 +19,13 @@ private:
 	//find free space
 	// iterate through data, looking for a place to put something 
 
-
-public:
 	//the cache should look through the list of keys to see if that key is
 	//in the array
 	std::map<key_type,Cache::val_type> keys;
+
+
+public:
+	
 
 	//for the trivial impplementation, the cache will stop adding things when
 	// it gets full
@@ -36,7 +38,7 @@ public:
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
 	mEvictor(evictor), mHasher(hasher)
 	{
-		data = std::make_unique<Cache::val_type>(new Cache::byte_type[mMaxmem]());
+		data = std::make_unique<Cache::byte_type>(new Cache::byte_type[mMaxmem]());
 							//here, the parens on the end initialize
 							// all of the things in data to zeros.
 	}
@@ -55,15 +57,15 @@ public:
 			if (index_that_we_are_up_to + size < mMaxmem ) 
 			{
 				//add key to the key map
-				keys[key] = &(data[size]);
+				keys[key] = &(data.get()[size]);
 				// keys is of val_type
-				// data is of val_type
+				// data is of pointer to byte_type
 				// size is of size_type
 
 				//first put the data in
-				for (int i = 0; i < size)	
+				for (size_type i = 0; i < size; i++)	
 				{
-					data[index_that_we_are_up_to + i] = val[i];
+					data.get()[index_that_we_are_up_to + i] = val[i];
 				}
 
 				//the increment data for trivial implementation
@@ -72,12 +74,20 @@ public:
 
 		}
 		//there isn't room for anything if there's only 1 byte left
-		if (index_that_we_are_up_to +1  >= maxmem) 
+		if (index_that_we_are_up_to + 1  >= mMaxmem) 
 		{
 			is_full = true;
 		}
 	}
 
+	Cache::val_type get(key_type key, size_type& val_size) 
+	{
+		if(keys.count(key) ==0 ){
+			return nullptr;	
+		}
+		return keys.at(key);
+	//idfk what eitan wants us to do with val_size
+	}
 
 	//get size given a ptr to the start of val, should be easy seeing as all
 	// values are char* that end with '\0'
@@ -87,9 +97,10 @@ public:
 		// update this to make sure there are keys too.
 		uint32_t iter = 0;
 		Cache::size_type size = 0;
-		while(data[val+iter] != '\0')
+		while(val[iter] != '\0')
 		{
 			size++;
+			iter++;
 		}
 		return size;
 	}
@@ -104,7 +115,7 @@ Cache::Cache(Cache::size_type maxmem,
 
 
 
-void set(key_type key, Cache::val_type val, Cache::size_type size)
+void Cache::set(key_type key, Cache::val_type val, Cache::size_type size)
 {
 	//finds a space in data where we can put things. I want to use a ring 
 	//buffer because I think they are OP
@@ -112,23 +123,20 @@ void set(key_type key, Cache::val_type val, Cache::size_type size)
 
 }
 
-Cache::val_type get(key_type key, Cache::size_type& Cache::val_size) const 
+Cache::val_type Cache::get(key_type key, size_type& val_size) const 
 {
-	if(!pImpl_->keys.find(key)){
-		return nullptr;
-	}
 
-	//idfk what eitan wants us to do with val_size
+	return pImpl_ -> get(key, val, size);	
+	
 
-	return pImpl_ -> keys[key];
 }
 
 
 //for now, in initial implementation, only use this to delete the last value
-bool del(key_type key)
+bool Cache::del(key_type key)
 {
 	//this impl should be in impl 
-	if(!pImpl_->keys.find(key)){
+	if(!(pImpl_->keys.find(key))){
 		return false;
 	}
 
@@ -151,13 +159,13 @@ bool del(key_type key)
 
 
 //all unused space should be '\0'
-Cache::size_type space_used() const 
+Cache::size_type Cache::space_used() const 
 {
 	//iterate through the array, counting all the '\0's that occur
 	// after other '\0s'
 }
 
-void reset()
+void Cache::reset()
 {
 	// I think with unique_ptrs, I can just 
 	pImpl_ = new Impl();
