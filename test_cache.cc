@@ -2,7 +2,23 @@
 
 //include a tester for a hasher
 //this hasher just returns the hash given from the key value mod size of cache.
-class hash
+struct key_hasher
+{
+
+
+	~key_hasher() = default;
+
+	key_hasher(const distance_map_t& distances)
+	: distances_(distances)
+	{}
+
+	//this is wrong, it's just a functor I used elsewhere
+	bool operator()(const vertex_descriptor &a, 
+					const vertex_descriptor &b ) const 
+	{
+		return (distances_.at(a) > distances_.at(b));
+	}
+};
 
 
 
