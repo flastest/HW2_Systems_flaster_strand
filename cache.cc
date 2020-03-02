@@ -82,16 +82,23 @@ public:
 
 	Cache::val_type get(key_type key, size_type& val_size) 
 	{
+
+
 		if(keys.count(key) ==0 ){
 			return nullptr;	
 		}
+
+		val_size = get_size_of_val(keys.at(key));
+
+
+
 		return keys.at(key);
 	//idfk what eitan wants us to do with val_size
 	}
 
 	//get size given a ptr to the start of val, should be easy seeing as all
 	// values are char* that end with '\0'
-	Cache::size_type get_ptr_to_end_of_val(Cache::val_type val)
+	Cache::size_type get_size_of_val(Cache::val_type val)
 	{
 		//this goes on the assumption that val is in the cache. should
 		// update this to make sure there are keys too.
@@ -126,7 +133,7 @@ void Cache::set(key_type key, Cache::val_type val, Cache::size_type size)
 Cache::val_type Cache::get(key_type key, size_type& val_size) const 
 {
 
-	return pImpl_ -> get(key, val, size);	
+	return pImpl_ -> get(key, val_size);	
 	
 
 }
