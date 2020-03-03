@@ -13,7 +13,12 @@ private:
 
 	std::unique_ptr<Cache::val_type> data;
 
+	//the cache should look through the list of keys to see if that key is
+	//in the array
+	std::map<key_type,Cache::val_type> keys;
 
+
+	//this is a butt counter only used for the current bad version.
 	Cache::size_type index_that_we_are_up_to = 0;
 
 	//find free space
@@ -21,13 +26,12 @@ private:
 
 
 public:
-	//the cache should look through the list of keys to see if that key is
-	//in the array
-	std::map<key_type,Cache::val_type> keys;
+	
 
 	//for the trivial impplementation, the cache will stop adding things when
 	// it gets full
 	bool is_full = false;
+	//this will be removed in the final version.
 
 	Impl(Cache::size_type maxmem,
         float max_load_factor,
@@ -138,16 +142,31 @@ public:
 	}
 
 
-	//this will iterate thru data, counting the things that aren't /0 followed by /0
+	//this will iterate thru data, counting the things that aren't \0 followed by \0.
+	//uh technically I think all the space is used beceause it's not like
+	// I'm gonna store other things in this allocated space.
 	Cache::size_type space_used() 
 	{
-		return 0;
+		Cache::size_type count = 0;
+		Cache::byte_type prev = ' '; //can be any char that isn't '\0'
+		Cache::byte_type current;
+
+		for (size_type i = 0; i < mMaxmem; i++)
+		{
+			current = *data.get()[i];
+			if (prev == '\0' && current == '\0') {
+				count++;
+			}
+			prev = current;
+		}
+
+		return count;
 	}
 
 	void reset() 
 	{
+		//just go thru the c-style array and set errythin to \0
 
-		
 	}
 
 
