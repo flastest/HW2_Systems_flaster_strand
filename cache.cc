@@ -55,7 +55,7 @@ public:
 			if (index_that_we_are_up_to + size < mMaxmem )
 			{
 				//add key to the key map
-				keys[key] = &(data.get()[size]);
+				keys[key] = (data.get()[index_that_we_are_up_to + size]);
 				// keys is of val_type
 				// data is of val_type
 				// size is of size_type
@@ -63,7 +63,7 @@ public:
 				//first put the data in
 				for (size_type i = 0; i < size; i++)
 				{
-					data.get()[index_that_we_are_up_to + i] = val[i];
+					data.get()[index_that_we_are_up_to + i] = &(val[i]);
 				}
 
 				//the increment data for trivial implementation
@@ -78,7 +78,7 @@ public:
 		}
 	}
 
-	Cache::val_type get(key_type key, size_type& val_size) const
+	Cache::val_type get(key_type key, size_type& val_size)
 	{
 
 
@@ -100,9 +100,9 @@ public:
 	{
 		//this goes on the assumption that val is in the cache. should
 		// update this to make sure there are keys too.
-		uint32_t iter = 0;
+		Cache::size_type iter = 0;
 		Cache::size_type size = 0;
-		while(data[val+iter] != '\0')
+		while(*(val+iter) != '\0')
 		{
 			size++;
 			iter++;
@@ -125,7 +125,7 @@ public:
 		//need to get size of key somehow
 
 		//first go to the pointer of key
-		auto ptr_to_value = keys[key];
+		//auto ptr_to_value = keys[key];
 
 		//then iterate though values til u get to "\0",deleting everything
 		//this should be in impl.
@@ -133,12 +133,26 @@ public:
 		//then remove key from the table
 
 
-		index_that_we_are_up_to = ptr_to_value;
+		//index_that_we_are_up_to = ptr_to_value;
 		return true;
 	}
+
+
+	//this will iterate thru data, counting the things that aren't /0 followed by /0
+	Cache::size_type space_used() 
+	{
+		return 0;
+	}
+
+	void reset() 
+	{
+		
+	}
+
+
 };
 
-Cache::Cache(Cache::size_type maxmem,
+Cache::Cache(size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
         hash_func hasher):
@@ -147,7 +161,7 @@ Cache::Cache(Cache::size_type maxmem,
 
 
 
-void set(key_type key, Cache::val_type val, Cache::size_type size)
+void Cache::set(key_type key, val_type val, size_type size)
 {
 	//finds a space in data where we can put things. I want to use a ring
 	//buffer because I think they are OP
@@ -155,7 +169,7 @@ void set(key_type key, Cache::val_type val, Cache::size_type size)
 
 }
 
-Cache::val_type get(key_type key, Cache::size_type& Cache::val_size) const
+Cache::val_type Cache::get(key_type key, size_type& val_size) const
 {
 
 	return pImpl_ -> get(key, val_size);	
@@ -164,7 +178,7 @@ Cache::val_type get(key_type key, Cache::size_type& Cache::val_size) const
 
 
 //for now, in initial implementation, only use this to delete the last value
-bool del(key_type key)
+bool Cache::del(key_type key)
 {
 
 	return pImpl_ -> del(key);
@@ -173,15 +187,16 @@ bool del(key_type key)
 
 
 //all unused space should be '\0'
-Cache::size_type space_used() const
+Cache::size_type Cache::space_used() const
 {
+	return pImpl_ -> space_used();
 	//iterate through the array, counting all the '\0's that occur
 	// after other '\0s'
 }
 
-void reset()
+void Cache::reset()
 {
 	// I think with unique_ptrs, I can just
-	pImpl_ = new Impl();
+	pImpl_ -> reset();
 	//and nothing bad happens, other thing is outta scope so we gucci
 }
