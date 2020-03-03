@@ -1,6 +1,7 @@
 #include "cache.hh"
 
 #include <map>
+#include <string>
 
 class Cache::Impl
 {
@@ -169,6 +170,18 @@ public:
 
 	}
 
+	//iterate thru every element and add it to the string
+	std::string to_string()
+	{
+		std::string elements;
+		for (size_type i = 0; i < mMaxmem; i++)
+		{
+			
+			elements = elements	+ *data.get()[i];
+		}
+		return elements;
+	}
+
 
 };
 
@@ -216,7 +229,10 @@ Cache::size_type Cache::space_used() const
 
 void Cache::reset()
 {
-	// I think with unique_ptrs, I can just
 	pImpl_ -> reset();
-	//and nothing bad happens, other thing is outta scope so we gucci
 }
+
+/*std::string Cache::to_string()
+{
+	return pImpl_ -> to_string();
+}*/
