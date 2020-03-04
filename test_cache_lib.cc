@@ -51,5 +51,7 @@ int main(){
     if (test_construct() > 0){
         std::cout<<"Constructor failed"<<std::endl
     }
+
+    return 0;
 }
 

@@ -1,6 +1,7 @@
 #include "cache.hh"
 
 #include <map>
+#include <unordered_map>
 #include <string>
 
 class Cache::Impl
@@ -10,26 +11,17 @@ private:
 	float mMax_load_factor;
 	Evictor* mEvictor;
 	hash_func mHasher;
+	Cache:size_type memory_used;
 
+	unordered_map<hashed_key, std::pair<key_type, val_type>> cache;
 
-	std::unique_ptr<Cache::val_type> data;
-
-	//the cache should look through the list of keys to see if that key is
-	//in the array
-	std::map<key_type,Cache::val_type> keys;
-
-
-	//this is a butt counter only used for the current bad version.
-	Cache::size_type index_that_we_are_up_to = 0;
-
-	//find free space
-	// iterate through data, looking for a place to put something
-
+	//this is a butt counter
+	int butt_counter = 0;
 
 public:
 	
 
-	//for the trivial impplementation, the cache will stop adding things when
+	//for the trivial implementation, the cache will stop adding things when
 	// it gets full
 	bool is_full = false;
 	//this will be removed in the final version.
@@ -40,63 +32,37 @@ public:
         hash_func hasher) :
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
 	mEvictor(evictor), mHasher(hasher)
-	{
-		data = std::make_unique<Cache::val_type>(new Cache::byte_type[mMaxmem]());
-							//here, the parens on the end initialize
-							// all of the things in data to zeros.
-	}
+    {}
 
 	//uses mHasher function to choose whether or not to encache something
-	void hash_and_insert(key_type key, Cache::val_type val, Cache::size_type size)
+	void set(key_type key, Cache::val_type val, Cache::size_type size)
 	{
 		//evictor:
 		// if cache is full, just don't add to the cache
 
 		//replace !is_full with evictor thing:
-		if (!is_full)
+		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
-			//first determine if there's room in data for the thing.
-			//needs to be imporved.
-			if (index_that_we_are_up_to + size < mMaxmem )
-			{
 				//add key to the key map
-				keys[key] = (data.get()[index_that_we_are_up_to + size]);
+				auto hashed_key = mHasher(key);
+				cache[hashed_key] = std::pair(key, val);
 				// keys is of val_type
 				// data is of val_type
 				// size is of size_type
+				memory_used += size;
 
-				//first put the data in
-				for (size_type i = 0; i < size; i++)
-				{
-					data.get()[index_that_we_are_up_to + i] = &(val[i]);
-				}
-
-				//the increment data for trivial implementation
-				index_that_we_are_up_to += size;
-			}
-
-		}
-		//there isn't room for anything if there's only 1 byte left
-		if (index_that_we_are_up_to +1  >= mMaxmem)
-		{
-			is_full = true;
 		}
 	}
 
 	Cache::val_type get(key_type key, size_type& val_size)
 	{
-
-
-		if(keys.count(key) ==0 ){
-			return nullptr;	
-		}
-
-		val_size = get_size_of_val(keys.at(key));
-
-
-
-		return keys.at(key);
-	
+	    auto hashed_key = mHasher(key);
+	    if (cache[hashed_key] && cache[hashed_key].first == key){
+	        auto ret = cache[hashed_key].second;
+	        val_size = get_size_of_val(ret);
+	        return ret;
+	    }
+	    return nullptr;
 	}
 
 	//get size given a ptr to the start of val, should be easy seeing as all
@@ -119,13 +85,15 @@ public:
 
 	bool del(key_type key)
 	{
+	    size_type size;
+	    val_type item = get(key, size);
+	    if (item)){
+            auto hashed_key = mHasher(key);
+            delete cache[hashed_key];  // TODO: how to remove thing from cache
+            memory_used -= size;
 
-		//this impl should be in impl
-		if(keys.count(key) == 0){
-			return false;
-		}
+	    }
 
-		is_full = false;
 
 		//need to get size of key somehow
 
@@ -198,7 +166,7 @@ void Cache::set(key_type key, val_type val, size_type size)
 {
 	//finds a space in data where we can put things. I want to use a ring
 	//buffer because I think they are OP
-	pImpl_ -> hash_and_insert(key, val, size);
+	pImpl_ -> set(key, val, size);
 
 }
 
