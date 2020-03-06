@@ -13,7 +13,7 @@
 #include <string>
 
 
-using cache_val_type = std::shared_ptr<byte_type>;
+using cache_val_type = std::shared_ptr<Cache::byte_type>;
 
 
 class Cache::Impl
@@ -23,8 +23,8 @@ private:
 	Cache::size_type mMaxmem;
 	float mMax_load_factor;
 	Evictor* mEvictor;
-	Cache:size_type memory_used;
-	unordered_map<key_type, std::pair<size_type, val_type>, hash_func > mCache;
+	Cache::size_type memory_used;
+	std::unordered_map<key_type, std::pair<size_type, val_type>, hash_func > mCache;
 	//this is a butt counter
 	int butt_counter = 0;
 
