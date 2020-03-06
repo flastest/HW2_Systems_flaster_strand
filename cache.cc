@@ -15,19 +15,16 @@
 class Cache::Impl
 {
 private:
+
 	Cache::size_type mMaxmem;
 	float mMax_load_factor;
 	Evictor* mEvictor;
-	hash_func mHasher;
 	Cache:size_type memory_used;
-
-	unordered_map<hashed_key, std::pair<key_type, val_type>> cache;
-
+	unordered_map<key_type, std::pair<size_type, val_type>, hash_func > mCache;
 	//this is a butt counter
 	int butt_counter = 0;
 
 public:
-	
 
 	//for the trivial implementation, the cache will stop adding things when
 	// it gets full
@@ -39,7 +36,7 @@ public:
         Evictor* evictor,
         hash_func hasher) :
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
-	mEvictor(evictor), mHasher(hasher)
+	mEvictor(evictor), mCache(hasher)
     {}
 
 	//uses mHasher function to choose whether or not to encache something
@@ -96,12 +93,10 @@ public:
 	    size_type size;
 	    val_type item = get(key, size);
 	    if (item)){
-            auto hashed_key = mHasher(key);
-            delete cache[hashed_key];  // TODO: how to remove thing from cache
+            mCache.erase(key);
             memory_used -= size;
 
 	    }
-
 
 		//need to get size of key somehow
 
