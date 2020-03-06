@@ -1,3 +1,11 @@
+// unordered map hashes stuff
+// store value and size in map
+// read unordered map documentation
+// when something doesnt fit then evict some stuff to make room
+// use pair as map object
+// implement butt counter
+
+
 #include "cache.hh"
 
 #include <map>
