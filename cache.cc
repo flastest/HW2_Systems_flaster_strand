@@ -92,7 +92,7 @@ public:
 	{
 	    size_type size;
 	    val_type item = get(key, size);
-	    if (item)){
+	    if (item){
             mCache.erase(key);
             memory_used -= size;
 
