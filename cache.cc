@@ -12,6 +12,10 @@
 #include <unordered_map>
 #include <string>
 
+
+using cache_val_type = std::shared_ptr<byte_type>;
+
+
 class Cache::Impl
 {
 private:
@@ -48,12 +52,13 @@ public:
 		//replace !is_full with evictor thing:
 		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
+				//first we ned to add something to the heap
+				//this needs to point to a new thing in the heap
+				cache_val_type new_cache_item_pointer = new byte_type[size];
+
 				//add key to the key map
-				auto hashed_key = mHasher(key);
-				cache[hashed_key] = std::pair(key, val);
-				// keys is of val_type
-				// data is of val_type
-				// size is of size_type
+				cache[key] = std::pair(size, new_cache_item_pointer);
+				
 				memory_used += size;
 
 		}
@@ -61,31 +66,13 @@ public:
 
 	Cache::val_type get(key_type key, size_type& val_size)
 	{
-	    auto hashed_key = mHasher(key);
-	    if (cache[hashed_key] && cache[hashed_key].first == key){
-	        auto ret = cache[hashed_key].second;
-	        val_size = get_size_of_val(ret);
+	    if (cache[key] && cache[key].first == key){
+	        auto ret = cache[key].second;
+	        val_size = cache[key].first;
 	        return ret;
 	    }
 	    return nullptr;
 	}
-
-	//get size given a ptr to the start of val, should be easy seeing as all
-	// values are char* that end with '\0'
-	Cache::size_type get_size_of_val(Cache::val_type val)
-	{
-		//this goes on the assumption that val is in the cache. should
-		// update this to make sure there are keys too.
-		Cache::size_type iter = 0;
-		Cache::size_type size = 0;
-		while(*(val+iter) != '\0')
-		{
-			size++;
-			iter++;
-		}
-		return size;
-	}
-
 
 
 	bool del(key_type key)
