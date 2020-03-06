@@ -40,7 +40,7 @@ public:
         Evictor* evictor,
         hash_func hasher) :
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
-	mEvictor(evictor), mCache(hasher)
+	mEvictor(evictor), mCache(maxmem, hasher)
     {}
 
 	//uses mHasher function to choose whether or not to encache something
