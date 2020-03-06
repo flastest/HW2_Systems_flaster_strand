@@ -11,6 +11,8 @@
 #include <map>
 #include <unordered_map>
 #include <string>
+#include <algorithm>
+
 
 
 using cache_val_type = std::shared_ptr<Cache::byte_type>;
@@ -24,7 +26,7 @@ private:
 	float mMax_load_factor;
 	Evictor* mEvictor;
 	Cache::size_type memory_used;
-	std::unordered_map<key_type, std::pair<size_type, val_type>, hash_func > mCache;
+	std::unordered_map<key_type, std::pair<size_type, cache_val_type>, hash_func > mCache;
 	//this is a butt counter
 	int butt_counter = 0;
 
@@ -54,10 +56,14 @@ public:
 		{
 				//first we ned to add something to the heap
 				//this needs to point to a new thing in the heap
-				cache_val_type new_cache_item_pointer = new byte_type[size];
+				cache_val_type new_cache_item_pointer(new byte_type[size]);
+
+				//now we need to copy val into new_cache_item_pointer
+				copy(new_cache_item_pointer, val, size);
 
 				//add key to the key map
-				cache[key] = std::pair(size, new_cache_item_pointer);
+				auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
+				mCache.insert(key_val_pair);
 				
 				memory_used += size;
 
@@ -66,9 +72,9 @@ public:
 
 	Cache::val_type get(key_type key, size_type& val_size)
 	{
-	    if (cache[key] && cache[key].first == key){
-	        auto ret = cache[key].second;
-	        val_size = cache[key].first;
+	    if (mCache[key] && mCache[key].first == key){
+	        auto ret = mCache[key].second;
+	        val_size = mCache[key].first;
 	        return ret;
 	    }
 	    return nullptr;
