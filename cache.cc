@@ -46,7 +46,7 @@ public:
     {}
 
 	//uses mHasher function to choose whether or not to encache something
-	void set(key_type key, const Cache::val_type val, Cache::size_type size)
+	void set(key_type key, Cache::val_type val, Cache::size_type size)
 	{
 		//evictor:
 		// if cache is full, just don't add to the cache
@@ -59,7 +59,7 @@ public:
 				cache_val_type new_cache_item_pointer(new byte_type[size]);
 
 				//now we need to copy val into new_cache_item_pointer
-				std::copy(val, val +size, new_cache_item_pointer);
+				std::copy(val, val+size, new_cache_item_pointer.get());
 
 				//add key to the key map
 				auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
@@ -156,7 +156,7 @@ void Cache::set(key_type key, val_type val, size_type size)
 Cache::val_type Cache::get(key_type key, size_type& val_size) const
 {
 
-	return pImpl_ -> get(key, val_size).get();	
+	return pImpl_ -> get(key, val_size).get();
 
 }
 
