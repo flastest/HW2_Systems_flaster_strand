@@ -3,7 +3,6 @@
 // read unordered map documentation
 // when something doesnt fit then evict some stuff to make room
 // use pair as map object
-// implement butt counter
 
 
 #include "cache.hh"
@@ -12,6 +11,7 @@
 #include <unordered_map>
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 
 
@@ -25,10 +25,8 @@ private:
 	Cache::size_type mMaxmem;
 	float mMax_load_factor;
 	Evictor* mEvictor;
-	Cache::size_type memory_used;
+	Cache::size_type memory_used = 0;
 	std::unordered_map<key_type, std::pair<size_type, cache_val_type>, hash_func > mCache;
-	//this is a butt counter
-	int butt_counter = 0;
 
 public:
 
@@ -54,18 +52,19 @@ public:
 		//replace !is_full with evictor thing:
 		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
-				//first we ned to add something to the heap
-				//this needs to point to a new thing in the heap
-				cache_val_type new_cache_item_pointer(new byte_type[size]);
+            std::cout<<"line 55"<<std::endl;
+            //first we ned to add something to the heap
+            //this needs to point to a new thing in the heap
+            cache_val_type new_cache_item_pointer(new byte_type[size]);
 
-				//now we need to copy val into new_cache_item_pointer
-				std::copy(val, val+size, new_cache_item_pointer.get());
+            //now we need to copy val into new_cache_item_pointer
+            std::copy(val, val+size, new_cache_item_pointer.get());
 
-				//add key to the key map
-				auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
-				mCache.insert(key_val_pair);
-				
-				memory_used += size;
+            //add key to the key map
+            auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
+            mCache.insert(key_val_pair);
+
+            memory_used += size;
 
 		}
 	}
@@ -74,7 +73,9 @@ public:
 	{
 	    if (mCache.find(key) != mCache.cend()){
 	        auto ret = mCache[key].second;
+            std::cout<<"line 74"<<std::endl;
 	        val_size = mCache[key].first;
+            std::cout<<"line 76"<<std::endl;
 	        return ret;
 	    }
 	    return nullptr;

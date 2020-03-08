@@ -1,5 +1,5 @@
 CXX = g++
-CCFLAGS = -Wall -Wextra -pedantic -Werror --std=c++17 -g
+CCFLAGS = --std=c++17 -g
 
 .cpp.o:
 	$(CXX) $(CCFLAGS) -c -O3 $<
@@ -7,7 +7,7 @@ CCFLAGS = -Wall -Wextra -pedantic -Werror --std=c++17 -g
 all: cache_test clean
 
 cache_test: cache.o test_cache_lib.o
-	$(CXX) $(CCFLAGS) -o test_cache cache.o test_cache.o
+	$(CXX) $(CCFLAGS) -o test_cache_lib cache.o test_cache_lib.o
 
 cache.o:	cache.cc
 	$(CXX) $(CCFLAGS) -c cache.cc
