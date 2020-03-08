@@ -23,28 +23,60 @@
 //	}
 //};
 
-bool test1(bool DEBUG_PRINT_MESSAGES){
+auto makeCache(){
     Cache* my_cache = new Cache(2048);
-    std::cout<<"line 27"<<std::endl;
     char value[]{ "four" };
-    std::cout<<"line 29"<<std::endl;
+    my_cache->set("apple", value, 5);
+    return my_cache;
+}
+
+bool testGet(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
     Cache::size_type size;
-    std::cout<<"line 31"<<std::endl;
-    my_cache->set("apple", value, 4);
-    std::cout<<"line 33"<<std::endl;
     auto ret = (my_cache->get("apple", size));
-    std::cout<<"line 35"<<std::endl;
-    if (ret == nullptr){
-        std::cout<<"null!!"<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) {
+        std::string p(ret);
+        std::cout << p << std::endl;
     }
-    std::string p(ret);
-    std::cout<<"line 37"<<std::endl;
-    std::cout<<p<<std::endl;
     return true;
 }
 
+bool testGetNull(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
+    Cache::size_type size;
+    auto ret = (my_cache->get("pear", size));
+    if (ret == nullptr){
+        return true;
+    }
+    return false;
+}
+
+bool testDel(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
+    Cache::size_type size;
+    return ((my_cache->del("apple")) && (my_cache->get("apple", size)== nullptr));
+}
+
+bool testDelNull(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
+    return !my_cache->del("pear");
+}
+
+bool testSpaceUsed(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
+    Cache::size_type size = 5;
+    auto ret = my_cache->space_used();
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"ret is: "<< ret <<", size is: "<<size<<std::endl;
+    return (ret == size);
+}
+
+
 int main(){
-    assert(test1(false));
+    assert(testGet(false));
+    assert(testGetNull(false));
+    assert(testDel(false));
+    assert(testDelNull(false));
+    assert(testSpaceUsed(false));
     return 0;
 }
 

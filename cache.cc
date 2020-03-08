@@ -52,7 +52,6 @@ public:
 		//replace !is_full with evictor thing:
 		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
-            std::cout<<"line 55"<<std::endl;
             //first we ned to add something to the heap
             //this needs to point to a new thing in the heap
             cache_val_type new_cache_item_pointer(new byte_type[size]);
@@ -73,9 +72,7 @@ public:
 	{
 	    if (mCache.find(key) != mCache.cend()){
 	        auto ret = mCache[key].second;
-            std::cout<<"line 74"<<std::endl;
 	        val_size = mCache[key].first;
-            std::cout<<"line 76"<<std::endl;
 	        return ret;
 	    }
 	    return nullptr;
@@ -90,6 +87,7 @@ public:
 
             mCache.erase(key);
             memory_used -= size;
+            return true;
 
 	    }
 
@@ -105,7 +103,7 @@ public:
 
 
 		//index_that_we_are_up_to = ptr_to_value;
-		return true;
+		return false;
 	}
 
 
@@ -114,12 +112,11 @@ public:
 	// I'm gonna store other things in this allocated space.
 	Cache::size_type space_used() 
 	{
-		return memory_used;
+	    return memory_used;
 	}
 
 	void reset() 
 	{
-		//just go thru the c-style array and set errythin to \0
 
 	}
 
