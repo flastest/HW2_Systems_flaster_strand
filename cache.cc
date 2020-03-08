@@ -25,22 +25,18 @@ private:
 	Cache::size_type mMaxmem;
 	float mMax_load_factor;
 	Evictor* mEvictor;
+	hash_func mHash;
 	Cache::size_type memory_used = 0;
 	std::unordered_map<key_type, std::pair<size_type, cache_val_type>, hash_func > mCache;
 
 public:
-
-	//for the trivial implementation, the cache will stop adding things when
-	// it gets full
-	bool is_full = false;
-	//this will be removed in the final version.
 
 	Impl(Cache::size_type maxmem,
         float max_load_factor,
         Evictor* evictor,
         hash_func hasher) :
 	mMaxmem(maxmem), mMax_load_factor(max_load_factor),
-	mEvictor(evictor), mCache(maxmem, hasher)
+	mEvictor(evictor), mHash(hasher), mCache(maxmem, hasher)
     {}
 
 	//uses mHasher function to choose whether or not to encache something
@@ -49,7 +45,6 @@ public:
 		//evictor:
 		// if cache is full, just don't add to the cache
 
-		//replace !is_full with evictor thing:
 		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
             //first we ned to add something to the heap
@@ -90,19 +85,6 @@ public:
             return true;
 
 	    }
-
-		//need to get size of key somehow
-
-		//first go to the pointer of key
-		//auto ptr_to_value = keys[key];
-
-		//then iterate though values til u get to "\0",deleting everything
-		//this should be in impl.
-
-		//then remove key from the table
-
-
-		//index_that_we_are_up_to = ptr_to_value;
 		return false;
 	}
 
@@ -117,8 +99,9 @@ public:
 
 	void reset() 
 	{
-
-	}
+        mCache = std::unordered_map<key_type, std::pair<size_type, cache_val_type>, hash_func > (mMaxmem, mHash);
+        memory_used = 0;
+    }
 
 	//iterate thru every element and add it to the string
 /*	std::string to_string()

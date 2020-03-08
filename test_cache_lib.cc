@@ -34,11 +34,11 @@ bool testGet(bool DEBUG_PRINT_MESSAGES){
     auto my_cache = makeCache();
     Cache::size_type size;
     auto ret = (my_cache->get("apple", size));
+    std::string p(ret);
     if (DEBUG_PRINT_MESSAGES) {
-        std::string p(ret);
         std::cout << p << std::endl;
     }
-    return true;
+    return (p == "four");
 }
 
 bool testGetNull(bool DEBUG_PRINT_MESSAGES){
@@ -70,6 +70,21 @@ bool testSpaceUsed(bool DEBUG_PRINT_MESSAGES){
     return (ret == size);
 }
 
+bool testReset(bool DEBUG_PRINT_MESSAGES){
+    auto my_cache = makeCache();
+    Cache::size_type size;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he's) br(ok)en"<<std::endl;
+    my_cache->reset();
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he) be(lie)ve(d)"<<std::endl;
+    auto ret = (my_cache->get("apple", size));
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"real eyes realize real lies..."<<std::endl;
+    if ((ret == nullptr) && (my_cache->space_used() == 0)){
+        return true;
+    }
+    return false;
+
+}
+
 
 int main(){
     assert(testGet(false));
@@ -77,6 +92,7 @@ int main(){
     assert(testDel(false));
     assert(testDelNull(false));
     assert(testSpaceUsed(false));
+    assert(testReset(false));
     return 0;
 }
 
