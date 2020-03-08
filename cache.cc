@@ -46,7 +46,7 @@ public:
     {}
 
 	//uses mHasher function to choose whether or not to encache something
-	void set(key_type key, Cache::val_type val, Cache::size_type size)
+	void set(key_type key, const Cache::val_type val, Cache::size_type size)
 	{
 		//evictor:
 		// if cache is full, just don't add to the cache
@@ -59,7 +59,7 @@ public:
 				cache_val_type new_cache_item_pointer(new byte_type[size]);
 
 				//now we need to copy val into new_cache_item_pointer
-				copy(new_cache_item_pointer, val, size);
+				std::copy(val, val +size, new_cache_item_pointer);
 
 				//add key to the key map
 				auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
@@ -70,9 +70,9 @@ public:
 		}
 	}
 
-	Cache::val_type get(key_type key, size_type& val_size)
+	cache_val_type get(key_type key, size_type& val_size)
 	{
-	    if (mCache[key] && mCache[key].first == key){
+	    if (mCache.find(key) != mCache.cend()){
 	        auto ret = mCache[key].second;
 	        val_size = mCache[key].first;
 	        return ret;
@@ -84,7 +84,7 @@ public:
 	bool del(key_type key)
 	{
 	    size_type size;
-	    val_type item = get(key, size);
+	    cache_val_type item = get(key, size);
 	    if (item){
 
             mCache.erase(key);
@@ -113,20 +113,7 @@ public:
 	// I'm gonna store other things in this allocated space.
 	Cache::size_type space_used() 
 	{
-		Cache::size_type count = 0;
-		Cache::byte_type prev = ' '; //can be any char that isn't '\0'
-		Cache::byte_type current;
-
-		for (size_type i = 0; i < mMaxmem; i++)
-		{
-			current = *data.get()[i];
-			if (prev == '\0' && current == '\0') {
-				count++;
-			}
-			prev = current;
-		}
-
-		return count;
+		return memory_used;
 	}
 
 	void reset() 
@@ -136,7 +123,7 @@ public:
 	}
 
 	//iterate thru every element and add it to the string
-	std::string to_string()
+/*	std::string to_string()
 	{
 		std::string elements;
 		for (size_type i = 0; i < mMaxmem; i++)
@@ -146,8 +133,7 @@ public:
 		}
 		return elements;
 	}
-
-
+*/
 };
 
 Cache::Cache(size_type maxmem,
@@ -170,7 +156,7 @@ void Cache::set(key_type key, val_type val, size_type size)
 Cache::val_type Cache::get(key_type key, size_type& val_size) const
 {
 
-	return pImpl_ -> get(key, val_size);	
+	return pImpl_ -> get(key, val_size).get();	
 
 }
 
