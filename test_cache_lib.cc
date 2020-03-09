@@ -1,4 +1,5 @@
 #include "cache.hh"
+#include "fifo_evictor.hh"
 
 #include <iostream>
 #include <string>
@@ -24,7 +25,8 @@
 //};
 
 auto makeCache(){
-    Cache* my_cache = new Cache(2048);
+    Fifo_Evictor *my_evictor = new Fifo_Evictor();
+    Cache* my_cache = new Cache(2048, 0.75, my_evictor);
     char value[]{ "four" };
     my_cache->set("apple", value, 5);
     return my_cache;

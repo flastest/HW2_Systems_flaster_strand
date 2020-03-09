@@ -25,5 +25,5 @@ class Evictor {
 
   // Request evictor for the next key to evict, and remove it from evictor.
   // If evictor doesn't know what to evict, return an empty key ("").
-  virtual const key_type evict() = 0;
+  virtual key_type evict() = 0;
 };

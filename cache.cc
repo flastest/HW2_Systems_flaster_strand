@@ -58,6 +58,7 @@ public:
             auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
             mCache.insert(key_val_pair);
 
+            mEvictor->touch_key(key);
             memory_used += size;
 
 		}
