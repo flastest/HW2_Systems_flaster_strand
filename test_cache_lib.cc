@@ -79,7 +79,7 @@ bool testSpaceUsed(bool DEBUG_PRINT_MESSAGES){
 }
 
 bool testReset(bool DEBUG_PRINT_MESSAGES){
-    if (DEBUG_PRINT_MESSAGES) std::cout<<"Testing restting the cache and making sure it's empty afterwards"<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"Testing resetting the cache and making sure it's empty afterwards"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
     if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he's) br(ok)en"<<std::endl;
@@ -99,16 +99,21 @@ bool testSameKey(bool DEBUG_PRINT_MESSAGES)
     if (DEBUG_PRINT_MESSAGES) std::cout<<"testing putting something into the array that a key already exists for"<<std::endl;
     auto my_cache = makeCache();
     char value[]{ "six" };
+    Cache::size_type size;
     my_cache->set("apple", value, 4);
-    //finish test!
-    return true;
+    auto ret = (my_cache->get("apple", size));
+    std::string p(ret);
+    if (DEBUG_PRINT_MESSAGES) {
+        std::cout << p << std::endl;
+    }
+    return (p == "six");
 }
 
 
 //this test shohuld fill up the array, then use the evictor to remove something to put something new in
 bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 {
-    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing evicting from a full array and putting soemthing new in"<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing evicting from a full array and putting something new in"<<std::endl;
     auto my_cache = makeCache(13);
     // i like bridge
     char spades[]{ "AK10xxx" };
