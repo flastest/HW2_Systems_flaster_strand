@@ -131,21 +131,29 @@ bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 
     if(DEBUG_PRINT_MESSAGES) std::cout<<"attempted to add hearts"<<std::endl;
 
-    Cache::size_type size;
-    auto ret = (my_cache->get("hearts", size));
+    Cache::size_type size_hearts;
+    Cache::size_type size_diamonds;
+    Cache::size_type size_spades;
+    auto hearts_gotten = (my_cache->get("hearts", size_hearts));
+    auto diamonds_gotten = (my_cache->get("diamonds", size_diamonds));
+    auto spades_gotten = (my_cache->get("spades", size_spades));
     
-    if(DEBUG_PRINT_MESSAGES) std::cout<<"hearts should've been added, ret is "<< ret <<"."<<std::endl;
-    if(DEBUG_PRINT_MESSAGES) std::cout<<"compare ret to hearts, which is "<<hearts<<"."<<std::endl;
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"hearts should've been added, hearts_gotten is "<< hearts_gotten <<"."<<std::endl;
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"compare hearts_gotten to hearts, which is "<<hearts<<"."<<std::endl;
 
-    //convert ret to a string
-    std::string hearts_holding_from_cache(ret);
-    if(hearts_holding_from_cache == "QJx") return true;
-
+    //convert get results to strings
+    std::string hearts_holding_from_cache(hearts_gotten);
+    std::string diamonds_holding_from_cache(diamonds_gotten);
 
     //test that spades are removed
     //check that diamonds are still there
-    
-    return false;
+
+    bool hearts_in_cache = (hearts_holding_from_cache == "QJx");
+    bool diamonds_in_cache = (diamonds_holding_from_cache == "KJxx");
+    bool spades_not_in_cache = (spades_gotten == nullptr);
+
+    return (hearts_in_cache && diamonds_in_cache && spades_not_in_cache);
+
 }
 
 
@@ -158,13 +166,13 @@ bool testEvictorEvictingSameItemTwice(bool DEBUG_PRINT_MESSAGES)
     auto my_cache = makeCache(9);
     char value[]{ "six" };
     my_cache->set("apple", value, 4);
-    
+
     //try adding something, see if it's in the cache and that the other thing's been removed
 
     char number_of_bananas[]{ "three" };
     Cache::size_type size;
     my_cache->set("banana", number_of_bananas, 6);
-    
+
     //make sure bananas is in the cache
     auto bananas_from_cache = (my_cache->get("banana", size));
     std::string bananas(bananas_from_cache);
