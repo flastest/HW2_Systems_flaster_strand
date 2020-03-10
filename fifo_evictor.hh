@@ -3,12 +3,16 @@
 #include "evictor.hh"
 
 #include <queue>
+#include <iostream>
 
-class Fifo_Evictor:Evictor{
+
+class Fifo_Evictor: public Evictor{
 
 public:
-    void touch_key(const key_type&) = 0;
-    key_type evict() = 0;
+	Fifo_Evictor() : Evictor(){};
+	~Fifo_Evictor(){};
+    void touch_key(const key_type&);
+    key_type evict();
 
 private:
 

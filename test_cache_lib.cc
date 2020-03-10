@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <cassert>
 
 //include a tester for a hasher
 //this hasher just returns the hash given from the key value mod size of cache.

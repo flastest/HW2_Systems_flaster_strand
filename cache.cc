@@ -16,7 +16,7 @@
 
 
 using cache_val_type = std::shared_ptr<Cache::byte_type>;
-
+using map_val_type = std::pair<Cache::size_type,cache_val_type>;
 
 class Cache::Impl
 {
@@ -55,8 +55,7 @@ public:
             std::copy(val, val+size, new_cache_item_pointer.get());
 
             //add key to the key map
-            auto key_val_pair = std::pair(key, std::pair(size, new_cache_item_pointer));
-            mCache.insert(key_val_pair);
+            mCache[key] = map_val_type(size	,new_cache_item_pointer	);
 
             mEvictor->touch_key(key);
             memory_used += size;
