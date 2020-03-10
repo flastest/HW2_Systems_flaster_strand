@@ -25,15 +25,16 @@
 //	}
 //};
 
-auto makeCache(){
+auto makeCache(Cache::size_type cache_size=2048){
     Fifo_Evictor *my_evictor = new Fifo_Evictor();
-    Cache* my_cache = new Cache(2048, 0.75, my_evictor);
+    Cache* my_cache = new Cache(cache_size, 0.75, my_evictor);
     char value[]{ "four" };
     my_cache->set("apple", value, 5);
     return my_cache;
 }
 
 bool testGet(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing putting and getting something from the cache"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
     auto ret = (my_cache->get("apple", size));
@@ -45,6 +46,7 @@ bool testGet(bool DEBUG_PRINT_MESSAGES){
 }
 
 bool testGetNull(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing getting something that isn't in the cache"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
     auto ret = (my_cache->get("pear", size));
@@ -55,17 +57,20 @@ bool testGetNull(bool DEBUG_PRINT_MESSAGES){
 }
 
 bool testDel(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing that a deleted item is no longer in the cache"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
     return ((my_cache->del("apple")) && (my_cache->get("apple", size)== nullptr));
 }
 
 bool testDelNull(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing deleting something that isn't in the cache"<<std::endl; 
     auto my_cache = makeCache();
     return !my_cache->del("pear");
 }
 
 bool testSpaceUsed(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing to make sure that space used is equal to the space of everything we put in"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size = 5;
     auto ret = my_cache->space_used();
@@ -74,6 +79,7 @@ bool testSpaceUsed(bool DEBUG_PRINT_MESSAGES){
 }
 
 bool testReset(bool DEBUG_PRINT_MESSAGES){
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"Testing restting the cache and making sure it's empty afterwards"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
     if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he's) br(ok)en"<<std::endl;
@@ -85,8 +91,57 @@ bool testReset(bool DEBUG_PRINT_MESSAGES){
         return true;
     }
     return false;
-
 }
+
+//should try putting in something with the same key to see what happens
+bool testSameKey(bool DEBUG_PRINT_MESSAGES)
+{
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing putting something into the array that a key already exists for"<<std::endl;
+    auto my_cache = makeCache();
+    char value[]{ "six" };
+    my_cache->set("apple", value, 4);
+    //finish test!
+    return true;
+}
+
+
+//this test shohuld fill up the array, then use the evictor to remove something to put something new in
+bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
+{
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing evicting from a full array and putting soemthing new in"<<std::endl;
+    auto my_cache = makeCache(13);
+    // i like bridge
+    char spades[]{ "AK10xxx" };
+    my_cache->set("spades", spades, 8);
+
+    char diamonds[]{ "KJxx" };
+    my_cache->set("diamonds", diamonds, 5);
+
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"array is full"<<std::endl;
+
+    //at this point, the cache should be full with spades and diamonds
+    //spades should be evicted so that hearts can be inserted.
+    char hearts[]{ "QJx" };
+    my_cache->set("hearts", hearts, 4);    
+
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"attempted to add hearts"<<std::endl;
+
+    Cache::size_type size;
+    auto ret = (my_cache->get("hearts", size));
+    
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"hearts should've been added, ret is "<< ret <<"."<<std::endl;
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"compare ret to hearts, which is "<<hearts<<"."<<std::endl;
+
+    //convert ret to a string
+    std::string hearts_holding_from_cache(ret);
+    if(hearts_holding_from_cache == "QJx") return true;
+
+    
+    return false;
+}
+
+//test cache evictor where evictor needs to evict multiple items
+
 
 
 int main(){
@@ -96,6 +151,10 @@ int main(){
     assert(testDelNull(false));
     assert(testSpaceUsed(false));
     assert(testReset(false));
+    assert(testSameKey(false));
+    assert(testEvictorWithFullCache(false));
+
+    std::cout<<"all tests pass!"<<std::endl;
     return 0;
 }
 

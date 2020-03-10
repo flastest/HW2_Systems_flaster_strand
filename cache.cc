@@ -57,8 +57,26 @@ public:
             //add key to the key map
             mCache[key] = map_val_type(size	,new_cache_item_pointer	);
 
-            mEvictor->touch_key(key);
+
+            //if there's an evictor, use it!
+            if (mEvictor) mEvictor->touch_key(key);
+
             memory_used += size;
+
+		}
+		else if(mEvictor){
+			//if there's no room, and an evictor, use the evictor!
+
+			//first, pop something from the evictor.
+			key_type key_to_evict = mEvictor->evict();
+
+			//keep evicting until key_to_evict is actually something in the cache
+			while (mCache.find(key_to_evict) == mCache.cend()) key_to_evict = mEvictor->evict();
+
+			del(key_to_evict);
+
+			//now try to set again. if more space is needed, another item should be evicted
+			set(key, val, size);
 
 		}
 	}
