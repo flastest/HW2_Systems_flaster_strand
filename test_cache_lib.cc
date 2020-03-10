@@ -110,7 +110,7 @@ bool testSameKey(bool DEBUG_PRINT_MESSAGES)
 }
 
 
-//this test shohuld fill up the array, then use the evictor to remove something to put something new in
+//this test should fill up the array, then use the evictor to remove something to put something new in
 bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 {
     if (DEBUG_PRINT_MESSAGES) std::cout<<"testing evicting from a full array and putting something new in"<<std::endl;
@@ -141,12 +141,42 @@ bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
     std::string hearts_holding_from_cache(ret);
     if(hearts_holding_from_cache == "QJx") return true;
 
+
+    //test that spades are removed
+    //check that diamonds are still there
     
     return false;
 }
 
+
 //test cache evictor where evictor needs to evict multiple items
 
+//evicts the same item twice
+bool testEvictorEvictingSameItemTwice(bool DEBUG_PRINT_MESSAGES)
+{
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"testing what happens when the same key is in the evictor twice, and we need to remove things twice."<<std::endl;
+    auto my_cache = makeCache(9);
+    char value[]{ "six" };
+    my_cache->set("apple", value, 4);
+    
+    //try adding something, see if it's in the cache and that the other thing's been removed
+
+    char number_of_bananas[]{ "three" };
+    Cache::size_type size;
+    my_cache->set("banana", number_of_bananas, 6);
+    
+    //make sure bananas is in the cache
+    auto bananas_from_cache = (my_cache->get("banana", size));
+    std::string bananas(bananas_from_cache);
+    int banana_num = size;
+
+    auto apples_from_cache = (my_cache->get("apple", size));
+
+    //check that apples is not in the cache
+    return (apples_from_cache == nullptr && bananas == "three" && size == 6);
+
+
+}
 
 
 int main(){
@@ -158,6 +188,7 @@ int main(){
     assert(testReset(false));
     assert(testSameKey(false));
     assert(testEvictorWithFullCache(false));
+    assert(testEvictorEvictingSameItemTwice(false));
 
     std::cout<<"all tests pass!"<<std::endl;
     return 0;
