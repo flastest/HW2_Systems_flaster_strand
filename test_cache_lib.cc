@@ -181,8 +181,20 @@ bool testEvictorEvictingSameItemTwice(bool DEBUG_PRINT_MESSAGES)
     auto apples_from_cache = (my_cache->get("apple", size));
 
     //check that apples is not in the cache
-    return (apples_from_cache == nullptr && bananas == "three" && size == 6);
+    if (DEBUG_PRINT_MESSAGES && !(apples_from_cache == nullptr && bananas == "three" && size == 6)) std::cout<<"the first evict failed"<<std::endl;
 
+    //now for the second evict
+    char number_of_oranges[]{ "two" };
+    my_cache->set("orange", number_of_oranges, 4);
+
+    auto orange_from_cache = (my_cache->get("orange", size));
+    std::string oranges(orange_from_cache);
+    int orange_num = size;
+    //now check to make sure oranges is in the cache and that bananas is nullptr
+
+    if(DEBUG_PRINT_MESSAGES) std::cout<<"this also tests that evictor tries again if there still isn't room for the next item"<<std::endl;
+
+    return (oranges == "two" && size ==4);
 
 }
 
