@@ -48,7 +48,7 @@ that item to the cache. This way, we don't evict everything in the cache for no 
 
 ## Tests
 
-The tests in our test files have pretty good code coverage. For each test we call a makeCache function, which makes a cache of size 2048 and populates it with a single key/value pair, <“apple”, “four”>. This cache object uses our fifo_evictor. We then call several other functions to ensure functionality.
+The tests in our test files have pretty good code coverage. For each test we call a makeCache function, which, unless other arguments are included, makes a cache of size 2048 and populates it with a single key/value pair, <“apple”, “four”>. This cache object uses our fifo_evictor. We then call several other functions to ensure functionality.
 
 As for simple tests, we make sure that get and del both return as expected, and we also make sure that calling get and del on things that are not in the cache work as expected as well. Then we test space_used by calling it on the cache and comparing it to the expected value. 
 
