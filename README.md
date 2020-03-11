@@ -1,11 +1,19 @@
 # Cache Impelementation
-### Ariel Flaster and Sarah Strand
+Ariel Flaster and Sarah Strand
+
+This is our implementation for the Hash it out assignment for Systems. This is an implementation of a cache that also comes equipped 
+with an evictor.
 
 ## Cache Structure
 
 Our cache hashes keys to an unordered map of size, value pairs. Data is stored in our cache as a shared pointer to the heap. 
 We used shared pointers so that items in our cache only get deleted when the shared pointer itself is deleted. This is good, 
 because it makes it easier for us to manage memory.
+
+We run all of our tests with the FIFO evictor that we made, but we also implemented (and tested) that our code works without an
+evictor too. In the case where there is no evictor, if an item is set in the cache that doesn't fit, we just don't add that item
+to the cache. Thankfully, however, we have an evictor that we use to wisely determine what happens when an item doesn't fit in
+our cache.
 
 ### Collision policy
 
@@ -17,10 +25,12 @@ data.
 
 Since we use an unordered map, all operations are O(1). 
 
+
+
 ## Evictor
 
 Our evictor is a standard FIFO queue that pops things to evict from the top of the queue and adds things to the bottom of the queue. It 
-has a private queue that it uses to keep track of what needs to be evicted.
+has a private queue that it uses to keep track of what needs to be evicted. 
 
 ### Eviction policy
 
