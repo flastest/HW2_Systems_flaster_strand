@@ -23,8 +23,8 @@ data.
 
 ### Performance
 
-Since we use an unordered map, all operations are O(1). 
-
+Since we use an unordered map with a hasher, all operations are O(1). Hashing is great. As long as we stay below the load factor, 
+finding items in our cache is a piece of cake. Our evictor is O(1) because we're just popping things from a queue. 
 
 
 ## Evictor
