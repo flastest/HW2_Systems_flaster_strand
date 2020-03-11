@@ -47,3 +47,12 @@ In the case where we are trying to set an item that is larger than the size of t
 that item to the cache. This way, we don't evict everything in the cache for no reason. 
 
 ## Tests
+
+The tests in our test files have pretty good code coverage. For each test we call a makeCache function, which makes a cache of size 2048 and populates it with a single key/value pair, <“apple”, “four”>. This cache object uses our fifo_evictor. We then call several other functions to ensure functionality.
+
+As for simple tests, we make sure that get and del both return as expected, and we also make sure that calling get and del on things that are not in the cache work as expected as well. Then we test space_used by calling it on the cache and comparing it to the expected value. 
+
+To test reset, we create a cache (as described), and reset it. Then we call get on something that used to exist in the cache, and return true if the get returns a nullptr. 
+
+We then have three more involved tests. The first tests what happens when we put something with the same key in twice. We expect the that putting the second item in will write over the first item, as per our collision policy. The second tests what happens when we try to add something to the cache when it’s already full. We expect that the evictor will evict the first item that was loaded in in order to make room for the new item, and it should leave all other items alone. Finally, we test what happens when we add two items with the same key to the cache (triggering the collision policy) and then need to evict that item later. We expect that the evictor will be aware that the collision policy has been triggered, and will know that there is only one copy of that object in the cache.
+ 
