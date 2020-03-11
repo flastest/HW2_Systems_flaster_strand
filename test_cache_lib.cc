@@ -5,26 +5,6 @@
 #include <string>
 #include <cassert>
 
-//include a tester for a hasher
-//this hasher just returns the hash given from the key value mod size of cache.
-//struct key_hasher
-//{
-//
-//
-//	~key_hasher() = default;
-//
-//	key_hasher(const distance_map_t& distances)
-//	: distances_(distances)
-//	{}
-//
-//	//this is wrong, it's just a functor I used elsewhere
-//	bool operator()(const vertex_descriptor &a,
-//					const vertex_descriptor &b ) const
-//	{
-//		return (distances_.at(a) > distances_.at(b));
-//	}
-//};
-
 auto makeCache(Cache::size_type cache_size=2048){
     Fifo_Evictor *my_evictor = new Fifo_Evictor();
     Cache* my_cache = new Cache(cache_size, 0.75, my_evictor);
@@ -82,11 +62,11 @@ bool testReset(bool DEBUG_PRINT_MESSAGES){
     if (DEBUG_PRINT_MESSAGES) std::cout<<"Testing resetting the cache and making sure it's empty afterwards"<<std::endl;
     auto my_cache = makeCache();
     Cache::size_type size;
-    if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he's) br(ok)en"<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"Cache created"<<std::endl;
     my_cache->reset();
-    if (DEBUG_PRINT_MESSAGES) std::cout<<"s(he) be(lie)ve(d)"<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"Cache reset"<<std::endl;
     auto ret = (my_cache->get("apple", size));
-    if (DEBUG_PRINT_MESSAGES) std::cout<<"real eyes realize real lies..."<<std::endl;
+    if (DEBUG_PRINT_MESSAGES) std::cout<<"Ret gotten"<<std::endl;
     if ((ret == nullptr) && (my_cache->space_used() == 0)){
         return true;
     }
@@ -110,7 +90,7 @@ bool testSameKey(bool DEBUG_PRINT_MESSAGES)
 }
 
 
-//this test should fill up the array, then use the evictor to remove something to put something new in
+// this test should fill up the array, then use the evictor to remove something to put something new in
 bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 {
     if (DEBUG_PRINT_MESSAGES) std::cout<<"testing evicting from a full array and putting something new in"<<std::endl;
@@ -147,7 +127,6 @@ bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 
     //test that spades are removed
     //check that diamonds are still there
-
     bool hearts_in_cache = (hearts_holding_from_cache == "QJx");
     bool diamonds_in_cache = (diamonds_holding_from_cache == "KJxx");
     bool spades_not_in_cache = (spades_gotten == nullptr);
@@ -156,9 +135,7 @@ bool testEvictorWithFullCache(bool DEBUG_PRINT_MESSAGES)
 
 }
 
-
 //test cache evictor where evictor needs to evict multiple items
-
 //evicts the same item twice
 bool testEvictorEvictingSameItemTwice(bool DEBUG_PRINT_MESSAGES)
 {
@@ -198,7 +175,8 @@ bool testEvictorEvictingSameItemTwice(bool DEBUG_PRINT_MESSAGES)
 
 }
 
-
+// Run all tests
+// Change to true for debugging print statements
 int main(){
     assert(testGet(false));
     assert(testGetNull(false));
@@ -213,4 +191,3 @@ int main(){
     std::cout<<"all tests pass!"<<std::endl;
     return 0;
 }
-

@@ -15,6 +15,6 @@ public:
     key_type evict();
 
 private:
-
+    // We use std::queue to keep track of the order of inputs for the purpose of fifo
     std::queue<key_type> mQueue;
 };

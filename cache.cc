@@ -1,8 +1,6 @@
-// unordered map hashes stuff
-// store value and size in map
-// read unordered map documentation
-// when something doesnt fit then evict some stuff to make room
-// use pair as map object
+// cache.cc
+// Ariel Flaster & Sarah Strand
+//
 
 
 #include "cache.hh"
@@ -12,8 +10,6 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
-
-
 
 using cache_val_type = std::shared_ptr<Cache::byte_type>;
 using map_val_type = std::pair<Cache::size_type,cache_val_type>;
@@ -39,11 +35,13 @@ public:
 	mEvictor(evictor), mHash(hasher), mCache(maxmem, hasher)
     {}
 
-	//uses mHasher function to choose whether or not to encache something
 	void set(key_type key, Cache::val_type val, Cache::size_type size)
 	{
-		//evictor:
-		// if cache is full, just don't add to the cache
+
+	    // Don't allow items that are bigger than the cache, or else everything will get evicted and the new item will not be added
+	    if (size > mMaxmem){
+	        return;
+	    }
 
 		if (memory_used + size < mMaxmem)  // TODO: fix this
 		{
@@ -55,8 +53,7 @@ public:
             std::copy(val, val+size, new_cache_item_pointer.get());
 
             //add key to the key map
-            mCache[key] = map_val_type(size	,new_cache_item_pointer	);
-
+            mCache[key] = map_val_type(size, new_cache_item_pointer	);
 
             //if there's an evictor, use it!
             if (mEvictor) mEvictor->touch_key(key);
@@ -65,12 +62,12 @@ public:
 
 		}
 		else if(mEvictor){
-			//if there's no room, and an evictor, use the evictor!
+			// if there's no room, and an evictor, use the evictor!
 
-			//first, pop something from the evictor.
+			// first, pop something from the evictor.
 			key_type key_to_evict = mEvictor->evict();
 
-			//keep evicting until key_to_evict is actually something in the cache
+			// keep evicting until key_to_evict is actually something in the cache
 			while (mCache.find(key_to_evict) == mCache.cend()) key_to_evict = mEvictor->evict();
 
 			del(key_to_evict);
@@ -91,7 +88,6 @@ public:
 	    return nullptr;
 	}
 
-
 	bool del(key_type key)
 	{
 	    size_type size;
@@ -106,33 +102,18 @@ public:
 		return false;
 	}
 
-
-	//this will iterate thru data, counting the things that aren't \0 followed by \0.
-	//uh technically I think all the space is used beceause it's not like
-	// I'm gonna store other things in this allocated space.
 	Cache::size_type space_used() 
 	{
 	    return memory_used;
 	}
 
+	// Reset will set the mCache variable to a new unordered map, writing over the other one
 	void reset() 
 	{
         mCache = std::unordered_map<key_type, std::pair<size_type, cache_val_type>, hash_func > (mMaxmem, mHash);
         memory_used = 0;
     }
 
-	//iterate thru every element and add it to the string
-/*	std::string to_string()
-	{
-		std::string elements;
-		for (size_type i = 0; i < mMaxmem; i++)
-		{
-			
-			elements = elements	+ *data.get()[i];
-		}
-		return elements;
-	}
-*/
 };
 
 Cache::Cache(size_type maxmem,
@@ -142,12 +123,9 @@ Cache::Cache(size_type maxmem,
 	pImpl_ (new Impl(maxmem,max_load_factor,evictor,hasher))
 	{}
 
-
-
 void Cache::set(key_type key, val_type val, size_type size)
 {
-	//finds a space in data where we can put things. I want to use a ring
-	//buffer because I think they are OP
+	//finds a space in data where we can put things
 	pImpl_ -> set(key, val, size);
 
 }
@@ -159,8 +137,6 @@ Cache::val_type Cache::get(key_type key, size_type& val_size) const
 
 }
 
-
-//for now, in initial implementation, only use this to delete the last value
 bool Cache::del(key_type key)
 {
 
@@ -168,21 +144,14 @@ bool Cache::del(key_type key)
 	
 }
 
-
 //all unused space should be '\0'
 Cache::size_type Cache::space_used() const
 {
 	return pImpl_ -> space_used();
-	//iterate through the array, counting all the '\0's that occur
-	// after other '\0s'
+
 }
 
 void Cache::reset()
 {
 	pImpl_ -> reset();
 }
-
-/*std::string Cache::to_string()
-{
-	return pImpl_ -> to_string();
-}*/
